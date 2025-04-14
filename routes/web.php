@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Contact
     Route::controller(ContactController::class)->group(function () {
-        Route::get('/admin/contact', 'index')->name('contact');
+        Route::get('/admin/contact', 'index')->name('contactForm');
     });
     
 

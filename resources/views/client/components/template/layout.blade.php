@@ -27,6 +27,82 @@
             justify-content:center;
         }
     </style>
+        <style>
+    /* Fondo general y texto */
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Textos generales */
+    h1, h2, h3, h4, h5, h6,
+    p, span, a, label, small, strong {
+        color: black !important;
+    }
+
+    /* Containers */
+
+
+    /* Navbar y menús */
+    .navbar, .dropdown-menu {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Formularios */
+    .form-control, .form-select, textarea {
+        background-color: white !important;
+        color: black !important;
+        border-color: #ced4da;
+    }
+
+    label {
+        color: black !important;
+    }
+
+    /* Botones Bootstrap - texto blanco */
+    .btn.btn-danger,
+    .btn.btn-info,
+    .btn.btn-primary,
+    .btn.btn-secondary,
+    .btn.btn-success,
+    .btn.btn-warning {
+        color: #fff !important;
+    }
+
+    /* bg-primary con opacidad Bootstrap */
+    .bg-primary {
+        --bs-bg-opacity: 1;
+        background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
+    }
+
+    /* Responsive paddings */
+    @media (min-width: 768px) {
+        .p-md-3 {
+            padding: 1rem !important;
+        }
+    }
+    .btn-custom {
+    background-color: #000000!important;
+    color: #D4AF37 !important;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #1a1a1a !important;
+}
+.card:hover {
+    border-color: #d4af37 !important; /* borde dorado */
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4); /* sombra dorada sutil */
+    transition: all 0.3s ease;
+}
+
+.card:hover .product-title {
+    color: #d4af37 !important; /* cambia el título a dorado al hacer hover */
+}
+
+</style>
 
 </head>
 <body>

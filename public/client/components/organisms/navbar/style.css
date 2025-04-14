@@ -1,10 +1,8 @@
 .header {
-    width: 100%;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* más suave */
 }
+
+
 
 .nav {
     height: 3.5rem;
@@ -78,18 +76,20 @@
 }
 
 .nav-link {
-    color: #000000;
-    font-weight: 500;
-    transition: 0.3s;
+    color: #000000; /* color inicial */
+    font-weight: 400;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
     font-size: 0.9rem;
     letter-spacing: 0.1rem;
     font-family: var(--font-secondary);
-    font-weight: 400;
     text-transform: uppercase;
+    text-decoration: none;
+    border-bottom: 2px solid transparent; /* efecto underline al pasar el mouse */
 }
 
 .nav-link:hover {
-    color: #000000b9;
+    color: #D4AF37; /* color al hacer hover */
+    border-bottom: 2px solid #D4AF37; /* línea elegante al hacer hover */
 }
 
 .show-menu {
@@ -390,4 +390,10 @@ footer {
 .nav-logo img {
     width: 55px;
     border-radius: 0.6rem;
+}
+.header {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
