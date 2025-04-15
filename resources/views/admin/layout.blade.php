@@ -67,8 +67,8 @@
                             </a>
 
                         </li>
-                        <li class="sidebar-item {{ request()->routeIs('contact')}}">
-                            <a href="{{route('contact')}}" class='sidebar-link'>
+                        <li class="sidebar-item {{ request()->routeIs('contactForm')}}">
+                            <a href="{{route('contactForm')}}" class='sidebar-link'>
                                 <i class="bi bi-box"></i>
                                 <span>Contactos</span>
                             </a>

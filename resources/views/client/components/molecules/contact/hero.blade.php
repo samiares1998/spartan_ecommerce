@@ -57,7 +57,7 @@
 
     <div class="form-container mt-5">
       <h2 class="text-center ">¿Tienes algo que contarnos?</h2>
-      <form  action="{{ route('contactForm') }}" method="post" enctype="multipart/form-data">
+      <form  action="{{ route('clientContactForm') }}" method="post" enctype="multipart/form-data">
       @csrf
         <div class="mb-3">
           <label for="fname" class="form-label">Nombre</label>

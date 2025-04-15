@@ -1,6 +1,6 @@
 <div class="shadow-sm p-md-4 p-2 d-flex gap-4 flex-md-row flex-column align-items-center text-md-start text-center" style="border-radius:1.2rem;">
-    <div style="width:100px;height:100px;" class="rounded-full bg-{{$bg}} rounded-circle d-flex align-items-center justify-content-center">
-        <div class="text-white">
+    <div style="width:100px;height:100px;" class="rounded-full bg-black rounded-circle d-flex align-items-center justify-content-center">
+        <div style="color: gold;">
             <i class="bi {{ $icon }} fs-1 fw-bold"></i>
         </div>
     </div>

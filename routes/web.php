@@ -42,7 +42,7 @@ Route::controller(ClientController::class)->group(function(){
     Route::post('/check-order-status', 'checkOrderStatus')->name('clientCheckOrderStatus');
     Route::get('/about', 'about')->name('clientAbout');
     Route::get('/contact', 'contact')->name('contact');
-    Route::post('/contactForm', 'contactForm')->name('contactForm');
+    Route::post('/client/contactForm', 'contactForm')->name('clientContactForm');
 });
 
 
@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Contact
     Route::controller(ContactController::class)->group(function () {
-        Route::get('/admin/contact', 'index')->name('contactForm');
+        Route::get('/admin/contactForm', 'index')->name('contactForm');
     });
     
 
