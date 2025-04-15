@@ -10,6 +10,8 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: none;
+    position: relative; /* o fixed/absolute según tu layout */
+    z-index: 10;
 }
 
 .nav-logo {
@@ -34,29 +36,33 @@
     font-size: 26px;
     font-weight: 600;
 }
-
 @media screen and (max-width: 767px) {
     .nav-menu {
-        position: fixed;
-        background-color: #fff7ff;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: -100%;
-        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-        z-index: 100;
-        padding: 4rem 0 0 3rem;
-        transition: 0.3s;
+      position: fixed;
+      background-color: #fff7ff;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 9999; /* más alto para que esté por encima de todo */
+      padding: 4rem 0 0 3rem;
+      transition: left 0.3s ease;
+      overflow-y: auto;
     }
-
-    .nav-logo img {
-        margin-left: 50px;
+  
+    .nav-menu:not(.show-menu) {
+      left: -100vw;
     }
-
-    .nav-button {
-        margin-top: 12px;
+  
+    .show-menu {
+      left: 0 !important;
     }
-}
+  
+    .nav-close {
+      z-index: 11111;
+    }
+  }
+  
 
 .nav-close {
     font-size: 1.5rem;
@@ -392,8 +398,34 @@ footer {
     border-radius: 0.6rem;
 }
 .header {
+    position: relative; /* ¡Obligatorio para z-index! */
+    z-index: 1000; /* Valor alto para garantizar que esté encima */
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.category-card2 {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: 0.2s cubic-bezier(0.57, 0, 0.06, 0.95);
+}
+
+.category-card2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(37, 57, 111, 0.5) 0%, rgba(37, 57, 111, 0.5) 92.57%);
+    border-radius: 1.5rem;
+    z-index: 0; /* 👈 ESTO es clave */
+}
+
+.category-card2 > div {
+    position: relative;
+    z-index: 1; /* 👈 ESTO hace que el texto y el botón se vean por encima */
 }
