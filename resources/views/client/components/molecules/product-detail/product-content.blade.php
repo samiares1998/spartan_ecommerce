@@ -112,7 +112,7 @@
           statusCode: {
             200: () => {
               Toastify({
-                text: "Success Add To Cart",
+                text: "Éxito al Añadir al carrito",
                 duration: 3000,
                 close:true,
                 gravity:"top",
@@ -122,7 +122,7 @@
             },
             201: () => {
               Toastify({
-                text: "Success Updated Quantity To Cart",
+                text: "Éxito al Actualizar la Cantidad al Carrito",
                 duration: 3000,
                 close:true,
                 gravity:"top",

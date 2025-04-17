@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Client;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
@@ -13,6 +14,7 @@ use App\Models\Carousel;
 use App\Models\ContactForm;
 use Validator;
 use Str;
+
 
 class ClientController extends Controller
 {
@@ -116,63 +118,92 @@ class ClientController extends Controller
         return view('client.checkout', $data);
     }
 
-    public function checkoutSave(Request $request){
-     
+    public function checkoutSave(Request $request) {
         $validator = Validator($request->all(), [
             'name' => 'required',
             'phone' => 'required',
             'address' => 'required',
-            'email' =>'required'
+            'email' => 'required'
         ]);
-
-        if($validator->fails()){
-           
+    
+        if($validator->fails()) {
             return redirect()->route('clientCheckout')->withErrors($validator)->withInput();
-        }else{
-          
-            $order_code = Str::random(3).'-'.Date('Ymd');
-
-            if(session('cart')){
-             
-                $total = 0;
-                foreach((array) session('cart') as $id => $details){
-                    $total += $details['price'] * $details['quantity'];
-
-                    $data[$id] = [
-                        'order_code' => $order_code,
-                        'title' => $details['title'],
-                        'price' => $details['price'],
-                        'quantity' => $details['quantity'],
-                    ];
-                }
-
-                Order::create([
-                    'shop_id' => Shop::first()->id,
-                    'order_code' => $order_code,
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'note' => $request->note,
-                    'email' => $request->email,
-                    'total' => $total,
-                    'status' => 0
-                ]);
-
-                OrderDetail::insert($data);
-
-                session()->forget('cart');
-
-                return redirect()->route('clientOrderCode', $order_code);
+        }
+    
+        // Verificar stock antes de procesar
+        foreach((array) session('cart') as $id => $details) {
+            $product = Product::find($id);
+            
+            if(!$product) {
+                return redirect()->route('clientCheckout')
+                       ->with('error', 'El producto '.$details['title'].' ya no está disponible');
             }
-            return redirect()->route('clientCheckout')->with('error', 'No tienes productos seleccionados');
-           
+    
+            if($product->stock < $details['quantity']) {
+                return redirect()->route('clientCheckout')
+                       ->with('error', 'No hay suficiente stock de '.$details['title'].' (Disponibles: '.$product->stock.')');
+            }
+        }
+    
+        // Procesar compra con transacción
+        DB::beginTransaction();
+        try {
+            $order_code = Str::random(3).'-'.Date('Ymd');
+            $total = 0;
+            $data = [];
+    
+            foreach((array) session('cart') as $id => $details) {
+                $product = Product::find($id);
+                $total += $details['price'] * $details['quantity'];
+    
+                // Actualizar stock
+                $product->decrement('stock', $details['quantity']);
+    
+                $data[] = [
+                    'order_code' => $order_code,
+                    'title' => $details['title'],
+                    'price' => $details['price'],
+                    'quantity' => $details['quantity'],
+                ];
+            }
+    
+            Order::create([
+                'shop_id' => Shop::first()->id,
+                'order_code' => $order_code,
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'note' => $request->note,
+                'email' => $request->email,
+                'total' => $total,
+                'status' => 0
+            ]);
+    
+            OrderDetail::insert($data);
+            session()->forget('cart');
+            DB::commit();
+    
+            return redirect()->route('clientOrderCode', $order_code);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error en checkout: '.$e->getMessage());
+            return redirect()->route('clientCheckout')
+                   ->with('error', 'Ocurrió un error al procesar tu pedido. Por favor intenta nuevamente.');
         }
     }
 
     public function successOrder($order_code){
+        // Obtener la orden principal
+        $order = Order::where('order_code', $order_code)->first();
+        // Obtener los detalles manualmente (sin relación Eloquent)
+        $orderDetails = OrderDetail::where('order_code', $order_code)->get();
+      
         $data = [
             'shop' => Shop::first(),
             'order_code' => $order_code,
+            'order' => $order,
+            'order_details' => $orderDetails,
             'title' => 'Checkout'
         ];
 

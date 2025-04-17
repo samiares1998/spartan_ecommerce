@@ -1,7 +1,7 @@
 <x-template.layout title="{{$title}}">
     <x-organisms.navbar cartCount=10 :path="$shop->path"/>
         <div class="container mt-3">
-            <h2>Carro de compras</h2>
+            <h2>Carrito de compras</h2>
             <hr/>
         </div>
     <x-organisms.carts />

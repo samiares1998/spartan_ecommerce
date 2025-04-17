@@ -10,4 +10,22 @@
       <a href="{{ route('clientCheckOrder') }}" class="btn btn-primary">Consultar Orden</a>
     </div>
   <x-organisms.footer :shop="$shop"/>
+  <script>
+    const order = @json($order);
+    const orderDetails = @json($order_details); // Usamos los detalles manuales
+    const emojiSpartan = String.fromCodePoint(0x1F3CB, 0xFE0F, 0x200D, 0x2642); 
+    let message = `¡Hola *${order.name}*! *SPARTAN* ${emojiSpartan}\n\n` +
+              `Gracias por tu compra. Detalles de tu pedido #${order.order_code}:\n\n` +
+              `Productos:\n${orderDetails.map(item => 
+                `- ${item.title} (x${item.quantity}): $${item.price * item.quantity}`
+              ).join('\n')}\n\n` +
+              `Total: $${order.total}\n\n` +
+              `¿Qué sigue?:\n` +
+              `1. Contacto para pago.\n` +
+              `2. Preparación de tu pedido.\n` +
+              `3. ¡Entrega lista!\n\n` +
+              `¿Dudas? ¡Respóndeme aquí!`;
+
+window.open(`https://wa.me/573213333915?text=${encodeURIComponent(message)}`, '_blank');
+</script>
 </x-template.layout>

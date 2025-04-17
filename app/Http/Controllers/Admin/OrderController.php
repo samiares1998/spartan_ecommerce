@@ -37,8 +37,8 @@ class OrderController extends Controller
 
             foreach($orderDetail as $item){
                 $product = Product::where('title', $item->title);
-                $updateStock = $product->first()->stock - $item->quantity;
-                $product->update(['stock' => $updateStock]);
+               // $updateStock = $product->first()->stock - $item->quantity;
+                //$product->update(['stock' => $updateStock]);
             }
 
         }else{
@@ -46,8 +46,8 @@ class OrderController extends Controller
             if($order->first()->status == 5){
                 foreach($orderDetail as $item){
                     $product = Product::where('title', $item->title);
-                    $updateStock = $product->first()->stock + $item->quantity;
-                    $product->update(['stock' => $updateStock]);
+                   // $updateStock = $product->first()->stock + $item->quantity;
+                   // $product->update(['stock' => $updateStock]);
                 }
             }
 

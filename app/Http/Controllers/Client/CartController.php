@@ -12,7 +12,7 @@ class CartController extends Controller
     public function carts(){
         $data = [
             'shop' => Shop::first(),
-            'title' => 'Carro de compras'
+            'title' => 'Carrito de compras'
         ];
 
         return view('client.carts', $data);
