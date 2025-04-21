@@ -23,7 +23,7 @@
                         <div id="input_div" class="mt-2">
                             <input type="button" value="-" onclick="minus($(this))" class="btn btn-outline-primary">
                             <input type="text" value="{{ $details['quantity'] }}" id="count" data-id="{{ $id }}" data-price="{{$details['price']}}" class="count btn btn-outline-primary font-secondary" disabled>
-                            <input type="button" value="+" onclick="plus($(this))" data-stock="{{ $details['product_stock'] }}" data-quantity="{{ $details['quantity'] }}" class="btn btn-outline-primary">
+                            <input type="button" value="+" onclick="plus($(this))" data-stock="{{ $details['stock'] }}" data-quantity="{{ $details['quantity'] }}" class="btn btn-outline-primary">
                         </div>
                     @endif
                 </div>

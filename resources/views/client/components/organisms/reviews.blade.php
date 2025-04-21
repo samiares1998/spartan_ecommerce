@@ -43,10 +43,10 @@
                                 
                                 <div class="card-body p-4">
                                     <div class="d-flex mb-3">
-                                        <img src="https://ui-avatars.com/api/?name=Ana+R&background=FF6B6B&color=fff" 
+                                        <img src="https://ui-avatars.com/api/?name=Alberto+R&background=FF6B6B&color=fff" 
                                              class="rounded-circle me-3" width="60" alt="Cliente">
                                         <div>
-                                            <h5 class="mb-0">Ana R.</h5>
+                                            <h5 class="mb-0">Alberto R.</h5>
                                             <div class="text-warning d-flex">
                                                 <i class="bi bi-star-fill"></i>
                                                 <i class="bi bi-star-fill"></i>

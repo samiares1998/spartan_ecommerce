@@ -13,5 +13,10 @@ class Order extends Model
         return $this->belongsTo(Shop::class);
     }
 
+    public function details()
+    {
+        return $this->hasMany(OrderDetail::class, 'order_code', 'order_code');
+    }
+
     use HasFactory;
 }

@@ -19,16 +19,28 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $row)
+                @foreach($products as $product)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{!! str_replace('-', ' ', ucwords($row->title)) !!}</td>
+                <td>{{ $product->title }}</td>
+                <td>{{ $product->has_variants ? 'Con variantes' : 'Simple' }}</td>
+                <td>
+                    @if($product->has_variants)
+                        {{ $product->skus_count }} combinaciones
+                    @else
+                        {{ $product->base_stock }} unidades
+                    @endif
+                </td>
+                <td>
+                    @if($product->has_variants)
+                        {{ $product->skus->min('price') }} - {{ $product->skus->max('price') }}
+                    @else
+                        {{ $product->base_price }}
+                    @endif
+                </td>
+
+
                     <td>
-                        {!! str_replace('-', ' ', ucwords($row->category->name)) !!}
-                    </td>
-                    <td>{{ $row->stock }}</td>
-                    <td>
-                        <a href="{{ route('productEdit', $row->title ) }}"><span class="btn btn-sm btn-outline-primary">Detail</span></a>
+                        <a href="{{ route('productEdit', $product->id ) }}"><span class="btn btn-sm btn-outline-primary">Detail</span></a>
                     </td>
                 </tr>
                 @endforeach

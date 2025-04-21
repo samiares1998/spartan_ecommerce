@@ -12,29 +12,32 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Carousel;
 use App\Models\ContactForm;
+use Illuminate\Support\Facades\Auth;
 use Validator;
 use Str;
 
 
 class ClientController extends Controller
 {
-    public function index(){
-
+    public function index()
+    {
         if(!Shop::exists()){
             return redirect()->route('register');
         }
-
+    
         $data = [
             'shop' => Shop::first(),
             'dataCarousel' => Carousel::all(),
-            'product' => Product::all()->sortByDesc('id')->take(8),
-            'category' => Category::all()->sortByDesc('id')->take(4),
+            'product' => Product::with(['skus', 'category', 'productImage'])
+                            ->orderByDesc('id')
+                            ->take(8)
+                            ->get(),
+            'category' => Category::orderByDesc('id')->take(4)->get(),
             'title' => 'Home'
         ];
-   
+    
         return view('client.index', $data);
     }
-
     public function products(){
         $data = [
             'shop' => Shop::first(),
@@ -89,25 +92,47 @@ class ClientController extends Controller
         return view('client.categoryProducts', $data);
     }
 
-    public function productDetail($product){
 
-        $product = Product::where('title', $product)->first();
-
-        if($product->category->product->count() > 1){
-            $recomendationProducts = $product->category->product->take(8);
-        }else{
-            $recomendationProducts = Product::all()->sortByDesc('id')->take(8);
+    public function productDetail($product)
+    {
+        $product = Product::with([
+                    'category.products', // Carga la categoría y sus productos
+                    'productImage', 
+                    'skus.variantOptions.variant',
+                    'variants.options'
+                  ])
+                 // ->where('slug', $product)
+                  ->where('title', $product)
+                  ->firstOrFail();
+    
+        // Obtener productos recomendados
+        $recommendationProducts = $product->category->products()
+                                ->where('id', '!=', $product->id)
+                                ->with(['productImage'])
+                                ->take(8)
+                                ->get();
+    
+        // Si no hay suficientes, completar con productos aleatorios
+        if($recommendationProducts->count() < 4) {
+            $additionalProducts = Product::where('category_id', '!=', $product->category_id)
+                                   ->with(['productImage'])
+                                   ->inRandomOrder()
+                                   ->take(8 - $recommendationProducts->count())
+                                   ->get();
+            
+            $recommendationProducts = $recommendationProducts->merge($additionalProducts);
         }
-
+    
         $data = [
             'shop' => Shop::first(),
             'product' => $product,
-            'recomendationProducts' => $recomendationProducts,
+            'recomendationProducts' => $recommendationProducts,
             'title' => str_replace('-', ' ', ucwords($product->title))
         ];
 
         return view('client.productDetail', $data);
     }
+
 
     public function checkout(){
         $data = [
@@ -132,19 +157,36 @@ class ClientController extends Controller
     
         // Verificar stock antes de procesar
         foreach((array) session('cart') as $id => $details) {
-            $product = Product::find($id);
+          
+            $product = Product::with([
+                'skus.variantOptions.variant',
+              ])
+             // ->where('slug', $product)
+              ->where('id', $details['product_id'])
+              ->firstOrFail();
+
             
+           
             if(!$product) {
                 return redirect()->route('clientCheckout')
                        ->with('error', 'El producto '.$details['title'].' ya no está disponible');
             }
-    
-            if($product->stock < $details['quantity']) {
-                return redirect()->route('clientCheckout')
-                       ->with('error', 'No hay suficiente stock de '.$details['title'].' (Disponibles: '.$product->stock.')');
+            if($details['item_id']==0 && !$product->has_variants){
+                if($product->base_stock < $details['quantity']) {
+                    return redirect()->route('clientCheckout')
+                           ->with('error', 'No hay suficiente stock de '.$details['title'].' (Disponibles: '.$product->base_stock.')');
+                }
+            }else{
+                $sku = $product->skus->firstWhere('id', $details['item_id']); // si el SKU ID está en $details
+                if (!$sku || $sku->stock < $details['quantity']) {
+                    return redirect()->route('clientCheckout')
+                        ->with('error', 'No hay suficiente stock de '.$details['title'].' (Disponibles: '.($sku ? $sku->stock : 0).')');
+                }
             }
-        }
     
+         
+        }
+        
         // Procesar compra con transacción
         DB::beginTransaction();
         try {
@@ -153,12 +195,24 @@ class ClientController extends Controller
             $data = [];
     
             foreach((array) session('cart') as $id => $details) {
-                $product = Product::find($id);
+
+                $product = Product::with([
+                    'skus.variantOptions.variant',
+                  ])
+                 // ->where('slug', $product)
+                  ->where('id', $details['product_id'])
+                  ->firstOrFail();
+    
+               
+                if($details['item_id']==0 && !$product->has_variants){
+                    $product->decrement('base_stock', $details['quantity']);
+                }else{
+                    $sku = $product->skus->firstWhere('id', $details['item_id']);
+                    $sku->decrement('stock', $details['quantity']);
+                }
+             
                 $total += $details['price'] * $details['quantity'];
-    
-                // Actualizar stock
-                $product->decrement('stock', $details['quantity']);
-    
+           
                 $data[] = [
                     'order_code' => $order_code,
                     'title' => $details['title'],
@@ -220,29 +274,50 @@ class ClientController extends Controller
         return view('client.check-order', $data);
     }
 
-    public function checkOrderStatus(Request $request){
-
-
-
-        $order = Order::where('order_code', $request->order_code)->first();
-
-
-        if($order){
-            $data = [
-                'shop' => Shop::first(),
-                'order' => $order,
-                'orderDetail' => OrderDetail::where('order_code', $request->order_code)->get(),
-                'title' => 'Consultar Orden'
-            ];
-            return view('client.check-order', $data);
-
-        }
-
+    public function checkOrderStatus(Request $request)
+    {
+        $shop = Shop::first(); // Mejor obtener esto una sola vez
         $data = [
-            'shop' => Shop::first(),
+            'shop' => $shop,
             'title' => 'Consultar Orden'
         ];
+    
+        if ($request->order_code) {
+            $order = Order::with([
+                'details.sku.variantOptions.variant', // Cargar relación de variantes
+                'details.product' // Cargar relación del producto base
+            ])->where('order_code', $request->order_code)->first();
 
+            if ($order) {
+                // Transformar los detalles para mostrar mejor la información
+                $orderDetails = $order->details->map(function($detail) {
+                  
+                    $item = [
+                        'product_name' => $detail->title,
+                        'quantity' => $detail->quantity,
+                        'price' => $detail->price,
+                        'total' => $detail->price * $detail->quantity
+                    ];
+    
+                    // Si tiene SKU (producto con variantes)
+                    if ($detail->sku) {
+                        $item['variants'] = $detail->sku->variantOptions->map(function($option) {
+                            return $option->variant->name . ': ' . $option->value;
+                        })->implode(', ');
+                    }
+    
+                    return $item;
+                });
+    
+                $data['order'] = $order;
+                $data['orderDetail'] = $orderDetails;
+                $data['orderTotal'] = $orderDetails->sum('total');
+               
+            } else {
+                $data['error'] = 'No se encontró una orden con ese código';
+            }
+        }
+    
         return view('client.check-order', $data);
     }
 

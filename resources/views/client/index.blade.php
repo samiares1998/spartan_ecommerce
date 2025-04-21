@@ -1,6 +1,9 @@
 <x-template.layout title="{{ $title }}">
   <x-organisms.navbar :path="$shop->path"/>
   <x-organisms.hero :dataProduct="$product"/>
+  <x-organisms.category :dataCategory="$category">
+    <x-molecules.button text="Mas Categorias" arrow="true" icon="bi-arrow-right" align="center" link="{{ route('clientCategory') }}"/>
+  </x-organisms.category>
   <x-organisms.choosen-us />
  <!--  <x-organisms.discounts /> -->
   <x-organisms.products :dataProduct="$product">
@@ -11,9 +14,7 @@
       </div>
     </x-slot:productCTA>
   </x-organisms.products>
-  <x-organisms.category :dataCategory="$category">
-    <x-molecules.button text="Mas Categorias" arrow="true" icon="bi-arrow-right" align="center" link="{{ route('clientCategory') }}"/>
-  </x-organisms.category>
+
   <x-organisms.reviews />
   <x-organisms.join-community />
   <x-organisms.footer :shop="$shop"/>

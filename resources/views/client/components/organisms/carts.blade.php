@@ -38,9 +38,10 @@
                 headers: {'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')},
                 type: "POST",
                 dataType: "json",
-                data: {"_token": "{{ csrf_token() }}", product_id: product_id, quantity : quantity},
+                data: {"_token": "{{ csrf_token() }}", item_key: product_id, quantity : quantity},
                 url : '{{ route("clientUpdateCart") }}',
                 success: function(data){
+                   // console.log(data);
                     $(".cart-total").text(data.total);
                 }
             })
@@ -89,9 +90,10 @@
                 headers: {'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')},
                 type: "POST",
                 dataType: "json",
-                data: {"_token": "{{ csrf_token() }}", id: id},
+                data: {"_token": "{{ csrf_token() }}", item_key: id},
                 url : '{{ route("clientDeleteCart") }}',
                 success: function(data){
+                   // console.log(data);
                     $(".cart-total").text(data.total);
                     removeItem.remove();
                     $('#cartCount').text(data.cartCount);

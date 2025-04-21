@@ -26,8 +26,16 @@
 <div class="container py-5">
     {{ $slot }}
     <div class="row g-3">
-        @foreach ($dataProduct as $item)
-            <x-molecules.product-card :image="$item->productImage" :category="$item->category->name" :title="$item->title" :price="$item->price"/>
+        @foreach ($dataProduct as $product)
+            <x-molecules.product-card 
+                :product="$product"
+                :image="$product->productImage->first()?->path"
+                :category="$product->category->name" 
+                :title="$product->title"
+                :price="$product->has_variants ? 
+                    'From $'.number_format($product->skus->min('price'), 2) : 
+                    '$'.number_format($product->base_price, 2)"
+            />
         @endforeach
     </div>
     {{ $productCTA ?? '' }}

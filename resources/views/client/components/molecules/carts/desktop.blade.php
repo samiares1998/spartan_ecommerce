@@ -81,14 +81,14 @@
                         <div id="input_div">
                             <input type="button" value="-" onclick="minus($(this))" class="btn btn-outline-primary">
                             <input type="text" value="{{ $details['quantity'] }}" id="count" data-id="{{ $id }}" data-price="{{$details['price']}}" class="count btn btn-outline-primary font-secondary" disabled>
-                            <input type="button" value="+" onclick="plus($(this))" data-stock="{{ $details['product_stock'] }}" data-quantity="{{ $details['quantity'] }}" class="btn btn-outline-primary">
+                            <input type="button" value="+" onclick="plus($(this))" data-stock="{{ $details['stock'] }}" data-quantity="{{ $details['quantity'] }}" class="btn btn-outline-primary">
                         </div>
                     @endif
                 </td>
                 <td>$<span class="product-subtotal" data-subtotal="{{ $details['price'] * $details['quantity'] }}">{{ $details['price'] * $details['quantity']}}</span></td>
                 @if(!request()->routeIs('clientCheckout'))
                     <td class="actions">
-                        <button class="btn btn-danger btn-sm remove-from-cart" data-id="{{ $id }}" onclick="deleteItem({{ $id }}, $(this), 'desktop')"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-danger btn-sm remove-from-cart" data-id="{{ $id }}" onclick="deleteItem('{{ $id }}', $(this), 'desktop')"><i class="bi bi-trash"></i></button>
                     </td>
                 @endif
             </tr>
