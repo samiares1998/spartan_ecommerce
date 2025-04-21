@@ -7,8 +7,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\CartController;
-use App\Http\Controllers\admin\CarouselController;
-use App\Http\Controllers\admin\ContactController;
+use App\Http\Controllers\Admin\CarouselController;
+use App\Http\Controllers\Admin\ContactController;
 
 /*
 |--------------------------------------------------------------------------
