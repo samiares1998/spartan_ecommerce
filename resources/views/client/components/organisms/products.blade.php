@@ -25,18 +25,26 @@
 
 <div class="container py-5">
     {{ $slot }}
-    <div class="row g-3">
-        @foreach ($dataProduct as $product)
-            <x-molecules.product-card 
-                :product="$product"
-                :image="$product->productImage->first()?->path"
-                :category="$product->category->name" 
-                :title="$product->title"
-                :price="$product->has_variants ? 
-                    'From $'.number_format($product->skus->min('price'), 2) : 
-                    '$'.number_format($product->base_price, 2)"
-            />
-        @endforeach
-    </div>
+
+    @if(!empty($dataProduct) && $dataProduct->count())
+        <div class="row g-3">
+            @foreach ($dataProduct as $product)
+                <x-molecules.product-card 
+                    :product="$product"
+                    :image="$product->productImage->first()?->path"
+                    :category="$product->category->name" 
+                    :title="$product->title"
+                    :price="$product->has_variants ? 
+                        'Desde $'.number_format($product->skus->min('price'), 2) : 
+                        '$'.number_format($product->base_price, 2)"
+                />
+            @endforeach
+        </div>
+    @else
+        <div class="text-center text-muted">
+            <p>No hay productos disponibles.</p>
+        </div>
+    @endif
+
     {{ $productCTA ?? '' }}
 </div>
