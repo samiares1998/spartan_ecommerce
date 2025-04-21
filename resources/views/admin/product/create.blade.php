@@ -113,9 +113,9 @@
         <label>Variant Type</label>
         <select class="form-select variant-type" name="variants[INDEX][type]">
           <option value="color">Color</option>
-          <option value="size">Talla</option>
-          <option value="weight">Peso</option>
-          <option value="flavor">Sabor</option>
+          <option value="talla">Talla</option>
+          <option value="peso">Peso</option>
+          <option value="sabor">Sabor</option>
         </select>
       </div>
       <div class="col-md-6">
