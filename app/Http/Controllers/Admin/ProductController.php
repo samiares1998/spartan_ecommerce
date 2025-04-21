@@ -50,7 +50,6 @@ class ProductController extends Controller
     }
     public function save(Request $request)
     {
-        dd($request);
 
         // Validación básica común
         $validator = Validator::make($request->all(), [
