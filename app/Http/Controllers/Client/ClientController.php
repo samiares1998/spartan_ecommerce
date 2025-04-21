@@ -88,9 +88,7 @@ class ClientController extends Controller
             'category' => Category::with('products')->where('name', $category)->first(),
             'title' => 'Category - '.str_replace('-', ' ', ucwords($category))
         ];
-    
-        dd($data); // Ahora deberías ver los productos en $data['category']->products
-    
+
         return view('client.categoryProducts', $data);
     }
     
