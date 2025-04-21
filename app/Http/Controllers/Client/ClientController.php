@@ -85,12 +85,15 @@ class ClientController extends Controller
     public function categoryProducts($category){
         $data = [
             'shop' => Shop::first(),
-            'category' => Category::where('name', $category)->first(),
+            'category' => Category::with('products')->where('name', $category)->first(),
             'title' => 'Category - '.str_replace('-', ' ', ucwords($category))
         ];
-
+    
+        dd($data); // Ahora deberías ver los productos en $data['category']->products
+    
         return view('client.categoryProducts', $data);
     }
+    
 
 
     public function productDetail($product)
