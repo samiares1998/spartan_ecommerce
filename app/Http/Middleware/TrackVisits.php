@@ -12,30 +12,42 @@ class TrackVisits
 {
     public function handle(Request $request, Closure $next)
     {
+        $start = microtime(true);
         $response = $next($request);
-        \Log::info('TrackVisits middleware ejecutándose');
-        \Log::info('IP: '.$request->ip());       
-        try {
-            if (app()->environment('production') || app()->environment('local')) {
-                $ip = $request->ip();
-                
-                // Obtener ubicación
-                $location = Location::get($ip);
-                
-                // Registrar la visita
-                Visit::create([
-                    'ip_address' => $ip,
-                    'country' => $location->countryName ?? 'Unknown',
-                    'city' => $location->cityName ?? 'Unknown',
-                    'browser' => $request->header('User-Agent'),
-                    'device' => $this->parseDevice($request->header('User-Agent')),
-                    'visited_at' => now(),
-                ]);
+        
+        // Verificar si ya hemos registrado esta visita en la sesión
+        if (!$request->session()->has('visit_tracked')) {
+            try {
+                if (app()->environment('production') || app()->environment('local')) {
+                    $ip = $request->ip();
+                    $location = Location::get($ip);
+                    
+                    $visit = Visit::create([
+                        'ip_address' => $ip,
+                        'country' => $location->countryName ?? 'Unknown',
+                        'city' => $location->cityName ?? 'Unknown',
+                        'browser' => $request->header('User-Agent'),
+                        'device' => $this->parseDevice($request->header('User-Agent')),
+                        'time_spent' => 0, // Inicializamos en 0
+                        'visited_at' => now(),
+                    ]);
+                    
+                    // Guardar el ID de la visita en la sesión
+                    $request->session()->put('visit_tracked', $visit->id);
+                    $request->session()->put('visit_start_time', $start);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error tracking visit: '.$e->getMessage());
             }
-        } catch (\Exception $e) {
-            Log::error('Error tracking visit: '.$e->getMessage());
+        } else {
+            // Actualizar tiempo si ya existe la visita
+            $visit = Visit::find($request->session()->get('visit_tracked'));
+            if ($visit) {
+                $duration = round(microtime(true) - $request->session()->get('visit_start_time'), 2);
+                $visit->update(['time_spent' => $duration]);
+            }
         }
-
+        
         return $response;
     }
     

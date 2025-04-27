@@ -56,5 +56,25 @@
             logo.classList.remove("d-none");
         }
     }
+    // En tu archivo JavaScript principal o en un script en el layout
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tiempo cuando se carga la página
+        const pageLoadTime = performance.now();
+        
+        window.addEventListener('beforeunload', function() {
+            // Calcula el tiempo total en segundos
+            const totalTime = Math.round((performance.now() - pageLoadTime) / 1000);
+            
+            // Datos a enviar
+            const analyticsData = new Blob([JSON.stringify({
+                time_spent: totalTime,
+                page_url: window.location.pathname,
+                _token: document.querySelector('meta[name="csrf-token"]').content
+            })], {type: 'application/json'});
+            
+            // Envía los datos
+            navigator.sendBeacon('/track-time', analyticsData);
+        });
+    });
   </script>
 @endprepend

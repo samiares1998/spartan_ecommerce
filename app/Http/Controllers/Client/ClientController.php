@@ -36,10 +36,7 @@ class ClientController extends Controller
             'category' => Category::orderByDesc('id')->take(4)->get(),
             'title' => 'Home'
         ];
-        $stats = [
-            'total_visits' => Visit::count(),
-            'recent_visits' => Visit::where('visited_at', '>', now()->subDays(7))->get(),
-        ];
+
    
         return view('client.index', $data);
     }

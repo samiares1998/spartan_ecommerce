@@ -9,7 +9,7 @@ use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\CarouselController;
 use App\Http\Controllers\Admin\ContactController;
-
+use App\Models\Visit;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,6 +22,34 @@ use App\Http\Controllers\Admin\ContactController;
 */
 
 // Client
+
+
+Route::post('/track-time', function(Request $request) {
+    // Validar los datos recibidos
+    $validated = $request->validate([
+        'time_spent' => 'required|integer|min:1',
+        'page_url' => 'sometimes|string'
+    ]);
+    
+    // Obtener la IP del usuario
+    $ip = $request->ip();
+    
+    // Buscar la última visita de esta IP
+    $visit = Visit::where('ip_address', $ip)
+                ->latest()
+                ->first();
+    
+    // Actualizar el tiempo si existe el registro
+    if ($visit) {
+        $visit->update([
+            'time_spent' => $validated['time_spent'],
+            'exit_url' => $validated['page_url'] ?? null
+        ]);
+    }
+    
+    return response()->noContent();
+})->middleware('web');
+
 
 Route::controller(ClientController::class)->group(function(){
     Route::get('/', 'index')->name('clientHome');

@@ -126,11 +126,17 @@
             position: "right",
             backgroundColor: "#4fbe87",
         }).showToast();
+
+   
+
+
     </script>
 @endif
 
 @stack('js')
 @stack('scripts')
+
+
 
 </body>
 </html>
