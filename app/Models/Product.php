@@ -12,15 +12,38 @@ class Product extends Model
 
     public function scopeFeatured($query, $limit = null)
     {
-        $query = $query->where('priority', '>', 0)
-                      ->orderBy('priority')
-                      ->orderByDesc('created_at');
+        // Primero obtener IDs de productos destacados
+        $featuredIds = Product::where('priority', '>', 0)
+                             ->orderBy('priority')
+                             ->pluck('id');
         
-        if ($limit) {
-            $query->take($limit);
+        // Si no se especifica límite, devolver todos ordenados
+        if (!$limit) {
+            return $query->orderByRaw(
+                "FIELD(id, ".$featuredIds->implode(',').") DESC"
+            )->orderByDesc('created_at');
         }
         
-        return $query;
+        // Calcular cuántos productos normales necesitamos
+        $needed = $limit - $featuredIds->count();
+        
+        if ($needed > 0) {
+            // Combinar productos destacados con otros productos
+            return $query->whereIn('id', $featuredIds)
+                       ->orWhere(function($q) use ($needed) {
+                           $q->where('priority', 0)
+                             ->orderByDesc('created_at')
+                             ->limit($needed);
+                       })
+                       ->orderByRaw(
+                           "CASE WHEN priority > 0 THEN 0 ELSE 1 END, priority"
+                       )
+                       ->limit($limit);
+        }
+        
+        return $query->whereIn('id', $featuredIds)
+                   ->orderBy('priority')
+                   ->limit($limit);
     }
 
     // Método para cambiar prioridad

@@ -30,8 +30,7 @@ class ClientController extends Controller
             'shop' => Shop::first(),
             'dataCarousel' => Carousel::all(),
             'product' => Product::with(['skus', 'category', 'productImage'])
-                            ->orderByDesc('id')
-                            ->take(8)
+                            ->featured(10)
                             ->get(),
             'category' => Category::orderByDesc('id')->take(4)->get(),
             'title' => 'Home'
@@ -41,12 +40,19 @@ class ClientController extends Controller
         return view('client.index', $data);
     }
     public function products(){
+
+        $products = Product::with(['productImage', 'category'])
+        ->featured(10)
+        ->paginate(10);
+
         $data = [
             'shop' => Shop::first(),
-            'product' => Product::featured(10)->get(),
+            'product' =>  $products,
             'category' => Category::all()->sortByDesc('id'),
             'title' => 'Products'
         ];
+
+        
 
         return view('client.products', $data);
     }
