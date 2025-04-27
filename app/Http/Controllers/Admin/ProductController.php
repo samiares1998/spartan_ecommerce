@@ -89,6 +89,7 @@ class ProductController extends Controller
             'base_price' => $request->product_type == 'simple' ? $request->base_price : 0,
             'base_stock' => $request->product_type == 'simple' ? $request->base_stock : 0,
             'has_variants' => $request->product_type == 'variant',
+            'priority' =>$request->pri,
             'user_id' => Auth::id() // Asignar el usuario creador
         ]);
     
@@ -238,6 +239,8 @@ class ProductController extends Controller
                 'has_variants' => $request->product_type == 'variant',
                 'base_price' => $request->product_type == 'simple' ? $request->base_price : 0,
                 'base_stock' => $request->product_type == 'simple' ? $request->base_stock : 0,
+                'priority' =>$request->pri
+                
             ];
  
             Product::where('id', $id)->update($productData);
@@ -328,4 +331,16 @@ class ProductController extends Controller
         Product::destroy($id);
         return redirect()->route('products')->with('success', 'Data product deleted');
     }
+
+    public function updatePriorities(Request $request)
+    {
+        $priorities = $request->input('priorities'); // [id => priority]
+        
+        foreach ($priorities as $productId => $priority) {
+            Product::where('id', $productId)->update(['priority' => $priority]);
+        }
+        
+        return back()->with('success', 'Prioridades actualizadas');
+    }
+
 }

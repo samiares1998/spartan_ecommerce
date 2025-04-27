@@ -43,7 +43,7 @@ class ClientController extends Controller
     public function products(){
         $data = [
             'shop' => Shop::first(),
-            'product' => Product::orderBy('id', 'DESC')->paginate(16),
+            'product' => Product::featured(10)->get(),
             'category' => Category::all()->sortByDesc('id'),
             'title' => 'Products'
         ];
