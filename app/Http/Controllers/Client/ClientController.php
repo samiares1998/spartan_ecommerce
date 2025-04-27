@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Carousel;
 use App\Models\ContactForm;
+use App\Models\Visit;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Str;
@@ -35,7 +36,11 @@ class ClientController extends Controller
             'category' => Category::orderByDesc('id')->take(4)->get(),
             'title' => 'Home'
         ];
-    
+        $stats = [
+            'total_visits' => Visit::count(),
+            'recent_visits' => Visit::where('visited_at', '>', now()->subDays(7))->get(),
+        ];
+   
         return view('client.index', $data);
     }
     public function products(){
